@@ -1,117 +1,150 @@
-README.txt
-──────────────────────────────────────────────
-Project: Real-Time Vertical Angle Estimator
-Author: [Your Name]
-Last Updated: [Today’s Date]
-──────────────────────────────────────────────
 
-Overview
---------
-This project provides a robust pipeline for real-time estimation of vertical angles from live video feed using OpenCV. It enables users to manually define a Region of Interest (ROI) and automatically detects line segments within that region to estimate the tilt angle from the vertical axis.
 
-It is especially useful for robotics, visual guidance systems, or any application requiring precise angle alignment from a camera feed.
+## Overview
 
-Files
------
+This project is a camera-based vertical angle detection system using OpenCV. It estimates the tilt of lines within a region of interest (ROI) drawn by the user from live video feed.
 
-1. angle_est.py
-   ─────────────
-   Main application file containing the `Calibrate` class.
+---
 
-   Responsibilities:
-   - ROI setup (manual or from file)
-   - Edge and line detection using Canny + Hough Transform
-   - Angle filtering using θ clustering
-   - Visual overlay of computed vertical angle
-   - Optional save/load for ROI configuration
+## Files Summary
 
-   Usage:
+### `angle_est.py`
+Main entry point that contains the `Calibrate` class and UI logic.
+
+#### Main Capabilities:
+- Allows users to define a triangle-shaped ROI (or loads it from `points.txt`).
+- Applies Canny edge detection and Hough Transform.
+- Clusters similar lines and filters based on vertical angle thresholds.
+- Draws both accepted and rejected lines in different colors for clarity.
+- Visualizes max vertical angle with arrows and angle arc.
+
+### `helpers.py`
+Support utilities for image manipulation and angle calculations.
+
+#### Functions:
+- `rotate(img, deg)`: Rotates image by a specified angle.
+- `create_binary_quad(points, img_size)`: Creates binary mask of a triangle.
+- `apply_roi(mask)`: Ensures ROI mask is valid (0 or 255).
+- `cluster_lines(lines, rho_bias, angle_bias)`: Clusters similar Hough lines.
+- `angle_est(theta, accept_angle)`: Converts theta to vertical angle in degrees; filters by range.
+
+### `points.txt`
+Stores the saved triangle ROI. Each line represents a point: X Y format.
+```
+3 585
+469 585
+236 -55
+```
+
+---
+
+## Parameters (in `Calibrate.__init__()`)
+
+| Parameter           | Meaning                                                       |
+|---------------------|---------------------------------------------------------------|
+| `saved_path`        | Path for saving/loading corner points                         |
+| `ANGLE_TRIANGLE`    | Apex angle (in degrees) used to define triangle ROI           |
+| `ACCEPT`            | Max allowable deviation from **vertical** (± degrees around 90°) |
+| `CROP_SIZE`         | Vertical crop height from bottom edge of ROI                  |
+| `FLIPCODE`          | OpenCV flip code (1=horizontal, 0=vertical, -1=both)          |
+| `CANNY_T1`/`T2`     | Lower/upper thresholds for Canny edge detection               |
+| `CANNY_APER`        | Aperture size for Canny                                        |
+| `BLUR_KSIZE`        | Kernel size for optional blur                                 |
+| `ROTATE_CW_DEG`     | Frame rotation clockwise in degrees                           |
+| `HOUGH_RHO`         | Distance resolution of Hough grid                             |
+| `HOUGH_THETA`       | Angular resolution of Hough grid (in radians)                 |
+| `HOUGH_THRESH`      | Min votes for a line to be detected                           |
+| `ANGLE_BIAS`        | Angle tolerance in radians for clustering lines               |
+| `RHO_BIAS`          | Distance tolerance in pixels for clustering lines             |
+| `W`, `H`            | Image resolution width/height                                 |
+| `debug`             | If `True`, shows Canny and ROI mask debug images              |
+
+---
+
+## How to Use
+
+1. Run the program:
    ```bash
    python angle_est.py
    ```
 
-2. helpers.py
-   ───────────
-   Utility functions abstracted to keep the main logic clean.
+2. Choose `y/n` when prompted to use saved ROI from `points.txt`.
+3. If `n`, click left and right base points in the `inputted` window.
+   - A top point is automatically calculated from the triangle's apex angle.
+   - Press `C` to confirm ROI or `R` to reset.
+4. After confirmation, angle detection starts automatically.
+5. Press `Q` to quit anytime.
 
-   Includes:
-   - `rotate`: Handle 90°-based image rotations.
-   - `create_binary_quad`: Generate a binary mask polygon from 3-point ROI.
-   - `apply_roi`: Clean mask before processing.
-   - `cluster_lines`: Group similar Hough lines by ρ and θ biases.
-   - `angle_est`: Convert θ to angle vs. vertical and apply acceptance criteria.
+---
 
-3. points.txt
-   ───────────
-   File for persistent storage of corner points.
+## Visual Output
 
-   Format:
-   Each line contains x and y coordinates of the corner points in pixel units.
-   ```
-   3   585
-   469 585
-   236 -55
-   ```
+- **Blue Lines**: Accepted vertical lines.
+- **Gray Lines**: Rejected lines (outside acceptable angle threshold).
+- **Red Arrow/Arc**: Shows max vertical tilt detected.
+- **Yellow Line**: Baseline reference.
 
-   Notes:
-   - Three points are needed to form a triangle: base-left, base-right, and apex.
-   - Created automatically when the user opts to save ROI.
+---
 
-How to Use
-----------
+## Debug Mode
 
-1. Run `angle_est.py`. On first run:
-   - Choose `n` to manually input ROI via clicking the camera feed.
-   - Click base-left, base-right → triangle apex is calculated automatically.
-   - Press `C` to confirm, or `R` to reset points.
-   - Optionally save to `points.txt`.
+Enabled by default. It shows:
+- Canny edge image (`Canny` window)
+- ROI mask image (`Mask ROI` window)
 
-2. On future runs:
-   - Choose `y` to auto-load previously saved ROI from `points.txt`.
+You can turn it off by setting `self.debug = False` in `Calibrate.__init__()`.
 
-3. During line detection:
-   - Uses `cv2.HoughLines` to detect lines within the ROI.
-   - Filters lines via `cluster_lines()` based on similarity thresholds.
-   - Uses `angle_est()` to estimate deviation from vertical.
+---
 
-4. Visualization:
-   - Live display shows lines and the angle visualization arc.
-   - Arrow and ellipse illustrate the vertical angle clearly.
+## Function Input/Output Summary
 
-Tuning Parameters
------------------
-
-Defined in `Calibrate.__init__()`:
-- `CROP_SIZE`: Remove lower region noise.
-- `CANNY_T1/T2/APER`: Edge detection thresholds.
-- `HOUGH_THRESH`: Minimum Hough votes to consider a line.
-- `ANGLE_BIAS`, `RHO_BIAS`: Clustering thresholds for line filtering.
-- `ACCEPT`: Acceptable range for near-vertical angles (± degrees).
-- `ROTATE_CW_DEG`: Set camera frame orientation (90, 180, 270).
-
-Dependencies
-------------
-- Python 3.7+
-- OpenCV (cv2)
-- NumPy
-
-Installation
-------------
-Install dependencies via pip:
-```bash
-pip install numpy opencv-python
+```python
+rotate(img, deg) → np.ndarray (rotated img)
+cluster_lines(lines, rho_bias, angle_bias) → np.ndarray (lines)
+create_binary_quad(points, img_size) → np.ndarray (mask)
+apply_roi(mask) → np.ndarray (roi)
+angle_est(theta, accept_angle) → float | False (angle)
 ```
 
-Known Issues
-------------
-- Only tested on camera input with 640x480 resolution.
-- ROI input is mouse-based and not currently persistent between sessions unless saved.
+---
 
-License
--------
-MIT License (or add your preferred license)
+## Dependencies
 
-──────────────────────────────────────────────
-Professional Tip:
-This tool is modular enough to embed in embedded vision pipelines (e.g., Jetson Nano or Raspberry Pi) with minor tweaks to frame capture logic.
+- Python 3.7+
+- OpenCV (`cv2`)
+- NumPy
+
+Install via:
+```bash
+pip install opencv-python numpy
+```
+
+---
+
+
+### Vertical Angle
+The system outputs the **direction angle** of each detected line measured from the y‑axis (0° = vertical, 90° = horizontal).  
+`ACCEPT` defines how close that direction angle must be to 90 ° (perfect vertical) for the line to be kept.
+
+### ROI Shape (Upward Triangle)
+`ANGLE_TRIANGLE` sets the two equal bottom angles.  
+The apex is computed as  
+```
+x_apex = (x_left + x_right)/2
+y_apex = y_left - (base_length/2) * tan(ANGLE_TRIANGLE°)
+```  
+Because OpenCV’s origin is top‑left, subtracting moves the apex upward on screen.
+
+### Purpose of `CROP_SIZE`
+After masking with the triangle ROI, the bottom horizontal edge could still be detected as a line.  
+Cropping `CROP_SIZE` pixels away removes that edge, reducing false horizontals.
+
+### Units
+| Parameter      | Unit |
+|----------------|------|
+| ANGLE_TRIANGLE | °    |
+| ACCEPT         | °    |
+| HOUGH_THETA    | rad  |
+| ANGLE_BIAS     | rad  |
+
 ──────────────────────────────────────────────
