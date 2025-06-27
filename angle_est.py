@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import math
 import os
-from helpers import rotate, create_binary_quad, apply_roi, cluster_lines, angle_est,vertical_deviation
+from helpers import rotate, create_binary_quad, apply_roi, cluster_lines, angle_est
 
 class Calibrate:
     def __init__(self):
