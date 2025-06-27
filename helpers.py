@@ -45,13 +45,7 @@ def apply_roi(mask):
     mask = np.clip(mask, 0, 255).astype(np.uint8)
     return mask
 
-def angle_est(theta,accept_angle=30):
-    angle_x_axis = math.degrees(np.pi / 2 - theta)
-    if not (- accept_angle <= angle_x_axis <= accept_angle):
-        return False
-
-    if 90 - angle_x_axis > 0:
-        angle = 90 - angle_x_axis
-    else: return False
-
-    return angle
+def angle_est(theta, accept_angle=30, debug=False):
+    deg = math.degrees(theta)
+    if deg>90+accept_angle or deg<90-accept_angle: return False
+    return deg

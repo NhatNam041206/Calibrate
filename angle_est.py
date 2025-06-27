@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 import math
 import os
-from helpers import rotate, create_binary_quad, apply_roi, cluster_lines, angle_est
+from helpers import rotate, create_binary_quad, apply_roi, cluster_lines, angle_est,vertical_deviation
 
 class Calibrate:
     def __init__(self):
         self.saved_path = 'points.txt'
-        self.ANGLE_TRIANGLE = math.radians(70)
+        self.ANGLE_TRIANGLE = 70
         self.ACCEPT = 25
         self.CROP_SIZE = 100
         self.FLIPCODE = 1
@@ -24,6 +24,7 @@ class Calibrate:
         self.W, self.H = 480, 640
         self.corner_points = []
         self.roi_created = False
+        self.debug = True
 
     def on_click_roi(self, event, x, y, *_):
         if event == cv2.EVENT_LBUTTONDOWN and len(self.corner_points) < 2:
@@ -81,7 +82,7 @@ class Calibrate:
                 p1, p2 = self.corner_points
                 distance = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
                 x_3 = int(round((p1[0] + p2[0]) / 2))
-                height = (distance / 2) * math.tan(self.ANGLE_TRIANGLE)
+                height = (distance / 2) * math.tan(math.radians(self.ANGLE_TRIANGLE))
                 y_3 = int(round(p1[1] - height))
                 apex = [x_3, y_3]
                 self.corner_points.append(apex)
@@ -150,7 +151,15 @@ class Calibrate:
 
             for rho, theta in flines:
                 angle = angle_est(theta,self.ACCEPT)
-                if not angle: continue
+                if not angle: 
+                    a, b = np.cos(theta), np.sin(theta)
+                    x0, y0 = a * rho, b * rho
+                    pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * a))
+                    pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * a))
+                    
+                    cv2.line(hough_vis, pt1, pt2, (150, 150, 150), 1)
+                        
+                    continue
                 
                 a, b = np.cos(theta), np.sin(theta)
                 x0, y0 = a * rho, b * rho
@@ -178,6 +187,9 @@ class Calibrate:
             cv2.putText(hough_vis, text_angle, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
             cv2.line(hough_vis, start, end_c, (255, 255, 0), 3)
 
+            if self.debug:
+                cv2.imshow("Canny", edges)
+                cv2.imshow("Mask ROI", roi)
             cv2.imshow("cam_tester", hough_vis)
             if cv2.waitKey(1) & 0xFF in (ord('q'), ord('Q')):
                 break
