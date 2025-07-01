@@ -1,10 +1,10 @@
 # Camera Line-Angle Calibration & PID Control
 
-This repository contains a **minimal but complete toolkit** for estimating the tilt of parallel floor tiles (or any pair of nearly-horizontal lines) in real-time, and mapping that angle to differential wheel RPM with a PID controller. It was designed for a small mobile robot, but the modules are written generically so you can reuse them in other vision-based alignment tasks.
+This toolkit measures the tilt of parallel floor tiles—or any nearly horizontal lines—live on camera, then feeds that angle into a PID controller that balances left‑ and right‑wheel RPMs.
 
 ---
 
-## 📂 File Overview
+## File Overview
 
 | File           | Purpose                                                                                                                                                                                                                          |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,7 +14,7 @@ This repository contains a **minimal but complete toolkit** for estimating the t
 
 ---
 
-## ✨ Features
+## Features
 
 1. **Interactive ROI selection**
    - Click the two base corners of the inspection triangle; the apex is auto-computed using `ANGLE_TRIANGLE` (default 70°).
@@ -34,7 +34,7 @@ This repository contains a **minimal but complete toolkit** for estimating the t
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ```bash
 python -m venv venv
@@ -46,7 +46,7 @@ pip install -r requirements.txt  # Requires opencv-contrib-python, numpy
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 python angle_est.py
@@ -108,7 +108,7 @@ A dead-band of ±2 ° prevents twitching when the robot is already aligned.
 
 ---
 
-## 📝 Saving & Loading `points.txt`
+## Saving & Loading `points.txt`
 
 ```
 <x1> <y1>
@@ -120,7 +120,7 @@ The file uses plain integers and is read automatically when you answer **y** to 
 
 ---
 
-## 🤔 FAQ
+## FAQ
 
 - **Why does the arrow sometimes disappear?**
   - No valid horizontal line was found within the `ACCEPT` band. Increase `ACCEPT` or improve lighting.
@@ -130,16 +130,4 @@ The file uses plain integers and is read automatically when you answer **y** to 
   - Tune `Kp`, reduce `Ki`, or increase `Kd`.
 
 ---
-
-## 📑 Licence
-
-This code is released under the MIT Licence – do whatever you like, but credit the authors.
-
----
-
-## 🙏 Acknowledgements
-
-- OpenCV for the robust computer-vision backbone
-- NumPy for vectorised line clustering
-- The robotics community for endless inspiration 🚗💨
 
