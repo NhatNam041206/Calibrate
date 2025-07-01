@@ -1,6 +1,6 @@
 # Camera Line-Angle Calibration & PID Control
 
-This toolkit measures the tilt of parallel floor tiles—or any nearly horizontal lines—live on camera, then feeds that angle into a PID controller that balances left‑ and right‑wheel RPMs. Originally built for a small mobile robot, its modules are generic enough to drop into any vision‑based alignment project.
+This toolkit measures the tilt of parallel floor tiles—or any nearly horizontal lines—live on camera, then feeds that angle into a PID controller that balances left‑ and right‑wheel RPMs.
 
 ---
 
