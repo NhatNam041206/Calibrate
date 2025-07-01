@@ -146,15 +146,3 @@ The file is read automatically when you answer **y** to “Use saved corner poin
 
 ---
 
-## Licence
-
-This code is released under the MIT Licence. Feel free to use, modify, and distribute it; just retain attribution.
-
----
-
-## Acknowledgements
-
-- OpenCV for the computer‑vision backbone
-- NumPy for fast numerical operations
-- The open‑source robotics community for constant inspiration
-
