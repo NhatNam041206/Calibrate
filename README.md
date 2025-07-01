@@ -1,10 +1,23 @@
 # Camera Line-Angle Calibration & PID Control
 
-This toolkit measures the tilt of parallel floor tiles—or any nearly horizontal lines—live on camera, then feeds that angle into a PID controller that balances left‑ and right‑wheel RPMs.
+This toolkit measures the tilt of parallel floor tiles—or any nearly horizontal lines—live on camera, then feeds that angle into a PID controller that balances left‑ and right‑wheel RPMs. Originally built for a small mobile robot, its modules are generic enough to drop into any vision‑based alignment project.
 
 ---
 
-## File Overview
+## 📑 Table of Contents
+
+- [File Overview](#file-overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Key Parameters](#key-parameters-all-in-angle_estpy)
+- [Algorithm Notes](#algorithm-notes)
+- [Saving & Loading ](#saving--loading-pointstxt)[`points.txt`](#saving--loading-pointstxt)
+- [FAQ](#faq)
+- [Licence](#licence)
+- [Acknowledgements](#acknowledgements)
+
+## 📂 File Overview
 
 | File           | Purpose                                                                                                                                                                                                                          |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,7 +27,7 @@ This toolkit measures the tilt of parallel floor tiles—or any nearly horizonta
 
 ---
 
-## Features
+## ✨ Features
 
 1. **Interactive ROI selection**
    - Click the two base corners of the inspection triangle; the apex is auto-computed using `ANGLE_TRIANGLE` (default 70°).
@@ -34,7 +47,7 @@ This toolkit measures the tilt of parallel floor tiles—or any nearly horizonta
 
 ---
 
-## Installation
+## 🛠️ Installation
 
 ```bash
 python -m venv venv
@@ -46,7 +59,7 @@ pip install -r requirements.txt  # Requires opencv-contrib-python, numpy
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ```bash
 python angle_est.py
@@ -108,7 +121,7 @@ A dead-band of ±2 ° prevents twitching when the robot is already aligned.
 
 ---
 
-## Saving & Loading `points.txt`
+## 📝 Saving & Loading `points.txt`
 
 ```
 <x1> <y1>
@@ -120,7 +133,7 @@ The file uses plain integers and is read automatically when you answer **y** to 
 
 ---
 
-## FAQ
+## 🤔 FAQ
 
 - **Why does the arrow sometimes disappear?**
   - No valid horizontal line was found within the `ACCEPT` band. Increase `ACCEPT` or improve lighting.
@@ -130,4 +143,16 @@ The file uses plain integers and is read automatically when you answer **y** to 
   - Tune `Kp`, reduce `Ki`, or increase `Kd`.
 
 ---
+
+## 📑 Licence
+
+This code is released under the MIT Licence – do whatever you like, but credit the authors.
+
+---
+
+## 🙏 Acknowledgements
+
+- OpenCV for the robust computer-vision backbone
+- NumPy for vectorised line clustering
+- The robotics community for endless inspiration 🚗💨
 
