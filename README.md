@@ -14,8 +14,6 @@ This toolkit measures the tilt of parallel floor tiles—or any nearly horizonta
 - [Algorithm Notes](#algorithm-notes)
 - [Saving & Loading points.txt](#saving--loading-pointstxt)
 - [FAQ](#faq)
-- [Licence](#licence)
-- [Acknowledgements](#acknowledgements)
 
 ## File Overview
 
