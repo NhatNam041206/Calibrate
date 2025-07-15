@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+import time
 import os
 from helpers import rotate, create_binary_quad, apply_roi, cluster_lines, PIDController
 
@@ -14,7 +15,7 @@ class Calibrate:
         # Img properties
         self.CROP_SIZE = 100
         self.FLIPCODE = 1
-        self.ROTATE_CW_DEG = 270
+        self.ROTATE_CW_DEG = 0
         self.W, self.H = 480, 640
         self.H_CROP = self.H - self.CROP_SIZE
         # Tunning
@@ -204,16 +205,19 @@ class Calibrate:
     def main(self):
         mask = create_binary_quad(self.corner_points, img_size=(self.H, self.W))
         roi = apply_roi(mask)
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture('Test.mp4')
+        print(f'FPS of the recorded Vid: {cap.get(cv2.CAP_PROP_FPS)}')
         
         #Initialize PID
         pid=PIDController(Kp=self.Kp, Ki=self.Ki, Kd=self.Kd,deadband=self.deadband,rpm_min=self.rpm_min,rpm_max=self.rpm_max,base_rpm=self.base_rpm)
-
+        prev_time=0
+        cur_time=0
         while True and self.roi_created:
             ret, frame = cap.read()
             if not ret:
                 break
 
+            cur_time=time.time()
             frame = self.preprocess_frame(frame, roi)
             edges = self.detect_edges(frame)
             lines = self.detect_lines(edges)
@@ -230,13 +234,16 @@ class Calibrate:
                     hough_vis = self.draw_overlay(hough_vis, angle)
                     rpm_L, rpm_R=pid.update(angle)
                     rpm_L, rpm_R=int(rpm_L), int(rpm_R)
-                    print(f'Right RPM: {rpm_R:.2f} Left RPM:{rpm_L:.2f}')
+                    print(f'Right RPM: {rpm_R:.2f} Left RPM:{rpm_L:.2f}',end=' ')
                     self.draw_direction(hough_vis,rpm_L,rpm_R)
 
                 else:
                     print("Vertical Angle: Not detected!")
+            fps=1/(cur_time-prev_time)
+            print(f'FPS: {fps}')
 
             self.show_frame("cam_tester", hough_vis)
+            prev_time=cur_time
             if cv2.waitKey(1) & 0xFF in (ord('q'), ord('Q')):
                 break
 
